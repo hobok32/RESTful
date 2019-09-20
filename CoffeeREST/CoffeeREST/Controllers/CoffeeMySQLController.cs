@@ -52,11 +52,20 @@ namespace CoffeeREST.Controllers
             return result;
         }
 
-        [HttpPost, Route("updateProduct")]
+        [HttpPut, Route("updateProduct")]
         public bool UpdateProduct(Product pro)
         {
             bool result = new CoffeeDAO().UpdateProduct(pro);
             return result;
         }
+
+        [HttpDelete, Route("deleteProduct")]
+        public bool DeleteProductByIdProduct(int idProduct)
+        {
+            bool result = new CoffeeDAO().DeleteProductById(idProduct);
+            return result;
+        }
+
+
     }
 }

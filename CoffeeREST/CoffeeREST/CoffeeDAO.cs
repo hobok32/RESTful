@@ -190,5 +190,18 @@ namespace CoffeeREST
             cmd.Parameters.Add(new MySqlParameter("@idProduct", pro.IdProduct));
             return cmd.ExecuteNonQuery() > 0;
         }
+
+        //Xóa sản phẩm
+        public bool DeleteProductById(int idProduct)
+        {
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "DELETE FROM Product WHERE idProduct=@idProduct";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idProduct", idProduct));
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+        //
     }
 }
