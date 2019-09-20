@@ -86,5 +86,109 @@ namespace CoffeeREST
             con.Close();
             return products;
         }
+
+        //Tìm kiếm sản phẩm trong 1 list Category bằng tên
+        public List<Product> SearchProductInCatByName(int idCat, string keyword)
+        {
+            List<Product> products = new List<Product>();
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "SELECT * FROM Product WHERE idCat=@idCat AND nameProduct LIKE '%" + keyword + "%'";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idCat", idCat));
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                Product pro = new Product();
+                pro.IdProduct = (int)dr["idProduct"];
+                pro.IdCat = (int)dr["idCat"];
+                pro.NameProduct = (string)dr["nameProduct"];
+                pro.PriceLargeProduct = (dr.IsDBNull(dr.GetOrdinal("priceLargeProduct"))) ? null : (int?)dr["priceLargeProduct"];
+                pro.PriceMediumProduct = (dr.IsDBNull(dr.GetOrdinal("priceMediumProduct"))) ? null : (int?)dr["priceMediumProduct"];
+                pro.PriceSmallProduct = (dr.IsDBNull(dr.GetOrdinal("priceSmallProduct"))) ? null : (int?)dr["priceSmallProduct"];
+                pro.PriceProduct = (dr.IsDBNull(dr.GetOrdinal("priceProduct"))) ? null : (int?)dr["priceProduct"];
+                pro.DescriptionProduct = (dr.IsDBNull(dr.GetOrdinal("descriptionProduct"))) ? "Không có mô tả" : (string)dr["descriptionProduct"];
+                products.Add(pro);
+            }
+            con.Close();
+            return products;
+        }
+
+        //Tìm kiếm sản phẩm bằng tên
+        public List<Product> SearchProductByName(string keyword)
+        {
+            List<Product> products = new List<Product>();
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "SELECT * FROM Product WHERE nameProduct LIKE '%" + keyword + "%'";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                Product pro = new Product();
+                pro.IdProduct = (int)dr["idProduct"];
+                pro.IdCat = (int)dr["idCat"];
+                pro.NameProduct = (string)dr["nameProduct"];
+                pro.PriceLargeProduct = (dr.IsDBNull(dr.GetOrdinal("priceLargeProduct"))) ? null : (int?)dr["priceLargeProduct"];
+                pro.PriceMediumProduct = (dr.IsDBNull(dr.GetOrdinal("priceMediumProduct"))) ? null : (int?)dr["priceMediumProduct"];
+                pro.PriceSmallProduct = (dr.IsDBNull(dr.GetOrdinal("priceSmallProduct"))) ? null : (int?)dr["priceSmallProduct"];
+                pro.PriceProduct = (dr.IsDBNull(dr.GetOrdinal("priceProduct"))) ? null : (int?)dr["priceProduct"];
+                pro.DescriptionProduct = (dr.IsDBNull(dr.GetOrdinal("descriptionProduct"))) ? "Không có mô tả" : (string)dr["descriptionProduct"];
+                products.Add(pro);
+            }
+            con.Close();
+            return products;
+        }
+
+        //Thêm sản phẩm
+        public bool AddProduct(Product pro)
+        {
+            if (pro.PriceProduct == 0)
+                pro.PriceProduct = null;
+            else if (pro.PriceLargeProduct == 0)
+                pro.PriceLargeProduct = null;
+            else if (pro.PriceMediumProduct == 0)
+                pro.PriceMediumProduct = null;
+            else if (pro.PriceSmallProduct == 0)
+                pro.PriceSmallProduct = null;
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "INSERT INTO Product VALUES (null, @idCat, @nameProduct, @priceSmallProduct, @priceMediumProduct, @priceLargeProduct, @priceProduct, @descriptionProduct)";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idCat", pro.IdCat));
+            cmd.Parameters.Add(new MySqlParameter("@priceSmallProduct", pro.PriceSmallProduct));
+            cmd.Parameters.Add(new MySqlParameter("@priceMediumProduct", pro.PriceMediumProduct));
+            cmd.Parameters.Add(new MySqlParameter("@priceLargeProduct", pro.PriceLargeProduct));
+            cmd.Parameters.Add(new MySqlParameter("@priceProduct", pro.PriceProduct));
+            cmd.Parameters.Add(new MySqlParameter("@descriptionProduct", pro.DescriptionProduct));
+            cmd.Parameters.Add(new MySqlParameter("@nameProduct", pro.NameProduct));
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+        //Update sản phẩm
+        public bool UpdateProduct(Product pro)
+        {
+            if (pro.PriceProduct == 0)
+                pro.PriceProduct = null;
+            else if (pro.PriceLargeProduct == 0)
+                pro.PriceLargeProduct = null;
+            else if (pro.PriceMediumProduct == 0)
+                pro.PriceMediumProduct = null;
+            else if (pro.PriceSmallProduct == 0)
+                pro.PriceSmallProduct = null;
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "UPDATE Product SET idCat=@idCat, priceSmallProduct=@priceSmallProduct, priceMediumProduct=@priceMediumProduct, priceLargeProduct=@priceLargeProduct, priceProduct=@priceProduct, descriptionProduct=@descriptionProduct, nameProduct=@nameProduct WHERE idProduct=@idProduct";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idCat", pro.IdCat));
+            cmd.Parameters.Add(new MySqlParameter("@priceSmallProduct", pro.PriceSmallProduct));
+            cmd.Parameters.Add(new MySqlParameter("@priceMediumProduct", pro.PriceMediumProduct));
+            cmd.Parameters.Add(new MySqlParameter("@priceLargeProduct", pro.PriceLargeProduct));
+            cmd.Parameters.Add(new MySqlParameter("@priceProduct", pro.PriceProduct));
+            cmd.Parameters.Add(new MySqlParameter("@descriptionProduct", pro.DescriptionProduct));
+            cmd.Parameters.Add(new MySqlParameter("@nameProduct", pro.NameProduct));
+            cmd.Parameters.Add(new MySqlParameter("@idProduct", pro.IdProduct));
+            return cmd.ExecuteNonQuery() > 0;
+        }
     }
 }
