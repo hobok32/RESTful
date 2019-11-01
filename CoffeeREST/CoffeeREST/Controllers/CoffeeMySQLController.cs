@@ -45,6 +45,7 @@ namespace CoffeeREST.Controllers
             return pro;
         }
 
+
         [HttpPost, Route("addProduct")]
         public bool AddProduct(Product pro)
         {
@@ -104,6 +105,22 @@ namespace CoffeeREST.Controllers
             List<ProductTopping> products = new CoffeeDAO().SelectAllProductToppingByIdCat(idCat);
             CatProductTopping catProduct = new CatProductTopping(products, cat);
             return (Object)catProduct;
+        }
+
+        [HttpGet, Route("getCatProToppingByNameIdCat")]
+        public Object SelectCatProductToppingByName(string name)
+        {
+            int count = new CoffeeDAO().SelectAllCategory().Count();
+            List<CatProductTopping> listCatProduct = new List<CatProductTopping>();
+            for (int i = 1; i <= count; i++)
+            {
+                Category cat = new CoffeeDAO().SelectCatByIdCat(i);
+                List<ProductTopping> products = new CoffeeDAO().SearchProToppingByNameIdCat(name,i);
+                CatProductTopping catProduct = new CatProductTopping(products, cat);
+                if(products.Count()>0)
+                    listCatProduct.Add(catProduct);
+            }
+            return (Object)listCatProduct;
         }
 
         [HttpGet, Route("getToppingByIdProduct")]

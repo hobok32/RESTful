@@ -122,6 +122,39 @@ namespace CoffeeREST
             return products;
         }
 
+        //Lấy tất cả sản phẩm + topping theo Category theo tên + idCat
+        public List<ProductTopping> SearchProToppingByNameIdCat(string keyword, int idCat)
+        {
+            List<ProductTopping> products = new List<ProductTopping>();
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "SELECT * FROM Product WHERE idCat=@idCat AND nameProduct LIKE '%" + keyword + "%'";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idCat", idCat));
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                ProductTopping pro = new ProductTopping();
+                pro.IdProduct = (int)dr["idProduct"];
+                pro.IdCat = (int)dr["idCat"];
+                pro.NameProduct = (string)dr["nameProduct"];
+                pro.PriceLargeProduct = (dr.IsDBNull(dr.GetOrdinal("priceLargeProduct"))) ? null : (int?)dr["priceLargeProduct"];
+                pro.PriceMediumProduct = (dr.IsDBNull(dr.GetOrdinal("priceMediumProduct"))) ? null : (int?)dr["priceMediumProduct"];
+                pro.PriceSmallProduct = (dr.IsDBNull(dr.GetOrdinal("priceSmallProduct"))) ? null : (int?)dr["priceSmallProduct"];
+                pro.PriceProduct = (dr.IsDBNull(dr.GetOrdinal("priceProduct"))) ? null : (int?)dr["priceProduct"];
+                pro.DescriptionProduct = (dr.IsDBNull(dr.GetOrdinal("descriptionProduct"))) ? "Không có mô tả" : (string)dr["descriptionProduct"];
+                pro.imgProduct = (dr.IsDBNull(dr.GetOrdinal("imgProduct"))) ? "Không có hình" : (string)dr["imgProduct"];
+
+                List<Topping> top = SelectToppingByIdProduct((int)dr["idProduct"]);
+                pro.Topping = top;
+
+                products.Add(pro);
+
+            }
+            con.Close();
+            return products;
+        }
+
         //Tìm kiếm sản phẩm trong 1 list Category bằng tên
         public List<Product> SearchProductInCatByName(int idCat, string keyword)
         {
@@ -286,6 +319,25 @@ namespace CoffeeREST
             MySqlConnection con = new MySqlConnection(strCon);
             con.Open();
             string strCmd = "SELECT * FROM Category WHERE idCat=@idCat";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idCat", idCat));
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                cat.IdCat = (int)dr["idCat"];
+                cat.NameCat = (string)dr["nameCat"];
+            }
+            con.Close();
+            return cat;
+        }
+
+        //Lấy Category theo idCat + name
+        public Category SelectCatByNameIdCat(string name, int idCat)
+        {
+            Category cat = new Category();
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "SELECT * FROM Category WHERE idCat=@idCat AND nameCat LIKE '%" + name + "%'";
             MySqlCommand cmd = new MySqlCommand(strCmd, con);
             cmd.Parameters.Add(new MySqlParameter("@idCat", idCat));
             MySqlDataReader dr = cmd.ExecuteReader();
