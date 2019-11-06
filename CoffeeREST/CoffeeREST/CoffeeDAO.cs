@@ -210,9 +210,14 @@ namespace CoffeeREST
             return products;
         }
 
-        //Thêm sản phẩm
-        public bool AddProduct(Product pro)
+        //Add sản phẩm
+        public bool AddProduct(ProductUpdate pro)
         {
+            int q1 = 0;
+            int q2 = 0;
+            List<int> q3 = new List<int>();
+            int q4 = 0;
+            int newIdProduct = 0;
             if (pro.PriceProduct == 0)
                 pro.PriceProduct = null;
             else if (pro.PriceLargeProduct == 0)
@@ -233,7 +238,57 @@ namespace CoffeeREST
             cmd.Parameters.Add(new MySqlParameter("@descriptionProduct", pro.DescriptionProduct));
             cmd.Parameters.Add(new MySqlParameter("@nameProduct", pro.NameProduct));
             cmd.Parameters.Add(new MySqlParameter("@imgProduct", pro.imgProduct));
-            return cmd.ExecuteNonQuery() > 0;
+            if (cmd.ExecuteNonQuery() > 0)
+                q1 = 1;
+            con.Close();
+
+
+            MySqlConnection con1 = new MySqlConnection(strCon);
+            con1.Open();
+            string strCmd2 = "SELECT * FROM product ORDER BY idProduct DESC LIMIT 1;";
+            MySqlCommand cmd2 = new MySqlCommand(strCmd2, con1);
+            MySqlDataReader dr = cmd2.ExecuteReader();
+            while (dr.Read())
+            {
+                newIdProduct = (int)dr["idProduct"];
+            }
+            if (newIdProduct != 0)
+                q2 = 1;
+            con1.Close();
+
+            MySqlConnection con2 = new MySqlConnection(strCon);
+            con2.Open();
+            for (int i = 0; i < pro.IdTopping.Count(); i++)
+                {
+                    if (pro.IdTopping[i] == 0)
+                        continue;
+
+                    string strCmd1 = "INSERT INTO producttopping VALUES (null,@idProduct,@idTopping)";
+                    MySqlCommand cmd1 = new MySqlCommand(strCmd1, con2);
+                    cmd1.Parameters.Add(new MySqlParameter("@idProduct", newIdProduct));
+                    cmd1.Parameters.Add(new MySqlParameter("@idTopping", pro.IdTopping[i]));
+                if (cmd1.ExecuteNonQuery() > 0)
+                    q3.Add(1);
+                else
+                    q3.Add(0);
+                }
+            con2.Close();
+
+            for (int i = 0; i < q3.Count(); i++)
+            {
+                if (q3[i] == 0)
+                {
+                    q4 = 0;
+                    break;
+                }
+                else
+                    q4 = 1;
+            }
+
+            if (q1 == 1 && q2 == 1)
+                return true;
+            else
+                return false;
         }
 
         //Update sản phẩm
@@ -284,12 +339,23 @@ namespace CoffeeREST
         //Xóa sản phẩm
         public bool DeleteProductById(int idProduct)
         {
+            int q = 0;
             MySqlConnection con = new MySqlConnection(strCon);
             con.Open();
             string strCmd = "DELETE FROM Product WHERE idProduct=@idProduct";
+            string strCmd1 = "DELETE from producttopping WHERE idProduct = @idProduct";
             MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            MySqlCommand cmd1 = new MySqlCommand(strCmd1, con);
             cmd.Parameters.Add(new MySqlParameter("@idProduct", idProduct));
-            return cmd.ExecuteNonQuery() > 0;
+            cmd1.Parameters.Add(new MySqlParameter("@idProduct", idProduct));
+            cmd1.ExecuteNonQuery();
+            if (cmd.ExecuteNonQuery() > 0)
+                q = 1;
+            con.Close();
+            if (q == 1)
+                return true;
+            else
+                return false;
         }
 
         //Lấy tất cả Category

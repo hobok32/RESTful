@@ -47,7 +47,7 @@ namespace CoffeeREST.Controllers
 
 
         [HttpPost, Route("addProduct")]
-        public bool AddProduct(Product pro)
+        public bool AddProduct(ProductUpdate pro)
         {
             bool result = new CoffeeDAO().AddProduct(pro);
             return result;
