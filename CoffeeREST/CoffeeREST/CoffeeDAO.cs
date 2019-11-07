@@ -372,6 +372,7 @@ namespace CoffeeREST
                 Category cat = new Category();
                 cat.IdCat = (int)dr["idCat"];
                 cat.NameCat = (string)dr["nameCat"];
+                cat.ImgCat = (string)dr["imgCat"];
                 catList.Add(cat);
             }
             con.Close();

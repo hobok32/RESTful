@@ -41,6 +41,7 @@ namespace CoffeeREST
     {
         public int IdCat { set; get; }
         public string NameCat { set; get; }
+        public string ImgCat { set; get; }
     }
     public class CatProduct
     {
