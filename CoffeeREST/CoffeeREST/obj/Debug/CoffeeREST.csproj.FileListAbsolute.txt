@@ -127,8 +127,8 @@ C:\Users\MiAn\Documents\GitHub\RESTful\CoffeeREST\CoffeeREST\bin\System.Net.Http
 C:\Users\MiAn\Documents\GitHub\RESTful\CoffeeREST\CoffeeREST\bin\System.Web.Http.xml
 C:\Users\MiAn\Documents\GitHub\RESTful\CoffeeREST\CoffeeREST\bin\System.Web.Http.WebHost.xml
 C:\Users\MiAn\Documents\GitHub\RESTful\CoffeeREST\CoffeeREST\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
-C:\Users\MiAn\Documents\GitHub\RESTful\CoffeeREST\CoffeeREST\obj\Debug\CoffeeREST.csprojAssemblyReference.cache
 C:\Users\MiAn\Documents\GitHub\RESTful\CoffeeREST\CoffeeREST\obj\Debug\CoffeeREST.csproj.CoreCompileInputs.cache
 C:\Users\MiAn\Documents\GitHub\RESTful\CoffeeREST\CoffeeREST\obj\Debug\CoffeeREST.csproj.CopyComplete
 C:\Users\MiAn\Documents\GitHub\RESTful\CoffeeREST\CoffeeREST\obj\Debug\CoffeeREST.dll
 C:\Users\MiAn\Documents\GitHub\RESTful\CoffeeREST\CoffeeREST\obj\Debug\CoffeeREST.pdb
+C:\Users\MiAn\Documents\GitHub\RESTful\CoffeeREST\CoffeeREST\obj\Debug\CoffeeREST.csprojAssemblyReference.cache

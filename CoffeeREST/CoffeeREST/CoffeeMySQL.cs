@@ -81,6 +81,7 @@ namespace CoffeeREST
         public int? PriceProduct { set; get; }
         public string DescriptionProduct { set; get; }
         public string imgProduct { set; get; }
+        public int rating { set; get; }
         public List<Topping> Topping { set; get; }
     }
 }

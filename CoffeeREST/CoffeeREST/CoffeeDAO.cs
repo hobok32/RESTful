@@ -111,6 +111,7 @@ namespace CoffeeREST
                 pro.PriceProduct = (dr.IsDBNull(dr.GetOrdinal("priceProduct"))) ? null : (int?)dr["priceProduct"];
                 pro.DescriptionProduct = (dr.IsDBNull(dr.GetOrdinal("descriptionProduct"))) ? "Không có mô tả" : (string)dr["descriptionProduct"];
                 pro.imgProduct = (dr.IsDBNull(dr.GetOrdinal("imgProduct"))) ? "Không có hình" : (string)dr["imgProduct"];
+                pro.rating = (int)dr["rate"];
 
                 List<Topping> top = SelectToppingByIdProduct((int)dr["idProduct"]);
                 pro.Topping = top;
@@ -120,6 +121,67 @@ namespace CoffeeREST
             }
             con.Close();
             return products;
+        }
+
+        //Lấy tất cả sản phẩm + topping theo Rating
+        public List<ProductTopping> SelectAllProductToppingByRating()
+        {
+            int tmp;
+            List<int> list = new List<int>();
+            List<ProductTopping> products = new List<ProductTopping>();
+            List<ProductTopping> products1 = new List<ProductTopping>();
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "SELECT * FROM Product";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                ProductTopping pro = new ProductTopping();
+                pro.IdProduct = (int)dr["idProduct"];
+                pro.IdCat = (int)dr["idCat"];
+                pro.NameProduct = (string)dr["nameProduct"];
+                pro.PriceLargeProduct = (dr.IsDBNull(dr.GetOrdinal("priceLargeProduct"))) ? null : (int?)dr["priceLargeProduct"];
+                pro.PriceMediumProduct = (dr.IsDBNull(dr.GetOrdinal("priceMediumProduct"))) ? null : (int?)dr["priceMediumProduct"];
+                pro.PriceSmallProduct = (dr.IsDBNull(dr.GetOrdinal("priceSmallProduct"))) ? null : (int?)dr["priceSmallProduct"];
+                pro.PriceProduct = (dr.IsDBNull(dr.GetOrdinal("priceProduct"))) ? null : (int?)dr["priceProduct"];
+                pro.DescriptionProduct = (dr.IsDBNull(dr.GetOrdinal("descriptionProduct"))) ? "Không có mô tả" : (string)dr["descriptionProduct"];
+                pro.imgProduct = (dr.IsDBNull(dr.GetOrdinal("imgProduct"))) ? "Không có hình" : (string)dr["imgProduct"];
+                pro.rating = (int)dr["rate"];
+                List<Topping> top = SelectToppingByIdProduct((int)dr["idProduct"]);
+                pro.Topping = top;
+
+                products.Add(pro);
+                list.Add((int)dr["rate"]);
+
+            }
+
+            for (int i = 0; i < list.Count(); i++)
+            {
+                for (int j = i + 1; j < list.Count(); j++)
+                {
+                    if (list[i] < list[j])
+                    {
+                        //cach trao doi gia tri
+                        tmp = list[i];
+                        list[i] = list[j];
+                        list[j] = tmp;
+                    }
+                }
+            }
+
+            for(int i = 0; i < products.Count(); i++)
+            {
+                for(int j = 0; j < 10; j++)
+                {
+                    if (products[i].rating == list[j])
+                        products1.Add(products[i]);
+                }
+            }
+
+
+            con.Close();
+            return products1;
         }
 
         //Lấy tất cả sản phẩm + topping theo Category theo tên + idCat
@@ -144,7 +206,7 @@ namespace CoffeeREST
                 pro.PriceProduct = (dr.IsDBNull(dr.GetOrdinal("priceProduct"))) ? null : (int?)dr["priceProduct"];
                 pro.DescriptionProduct = (dr.IsDBNull(dr.GetOrdinal("descriptionProduct"))) ? "Không có mô tả" : (string)dr["descriptionProduct"];
                 pro.imgProduct = (dr.IsDBNull(dr.GetOrdinal("imgProduct"))) ? "Không có hình" : (string)dr["imgProduct"];
-
+                pro.rating = (int)dr["rate"];
                 List<Topping> top = SelectToppingByIdProduct((int)dr["idProduct"]);
                 pro.Topping = top;
 
@@ -335,6 +397,18 @@ namespace CoffeeREST
             return cmd.ExecuteNonQuery() > 0;
         }
         
+        //Update category
+        public bool UpdateCategory(Category cat)
+        {
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "UPDATE category SET nameCat=@nameCat, imgCat=@imgCat WHERE idCat=@idCat";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idCat", cat.IdCat));
+            cmd.Parameters.Add(new MySqlParameter("@nameCat", cat.NameCat));
+            cmd.Parameters.Add(new MySqlParameter("@imgCat", cat.ImgCat));
+            return cmd.ExecuteNonQuery() > 0;
+        }
 
         //Xóa sản phẩm
         public bool DeleteProductById(int idProduct)
@@ -356,6 +430,17 @@ namespace CoffeeREST
                 return true;
             else
                 return false;
+        }
+
+        //Xóa category
+        public bool DeleteCategoryByIdCat(int idCat)
+        {
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "DELETE FROM category WHERE idCat=@idCat";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idCat", idCat));
+            return cmd.ExecuteNonQuery()>0;
         }
 
         //Lấy tất cả Category
@@ -395,6 +480,16 @@ namespace CoffeeREST
                 cat.NameCat = (string)dr["nameCat"];
             }
             con.Close();
+            return cat;
+        }
+
+        //Lấy Category của rating
+        public Category SelectCatRating()
+        {
+            Category cat = new Category();
+            cat.IdCat = 0;
+            cat.NameCat = "Nổi bật";
+            cat.ImgCat = "";
             return cat;
         }
 
@@ -451,5 +546,16 @@ namespace CoffeeREST
             }
         }
 
+        //Thêm Category
+        public bool AddCategory(Category cat)
+        {
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "INSERT INTO category VALUES (null, @nameCat, @imgCat);";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@nameCat", cat.NameCat));
+            cmd.Parameters.Add(new MySqlParameter("@imgCat", cat.ImgCat));
+            return cmd.ExecuteNonQuery() > 0;
+        }
     }
 }

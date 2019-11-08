@@ -44,12 +44,18 @@ namespace CoffeeREST.Controllers
             List<Product> pro = new CoffeeDAO().SearchProductByName(name);
             return pro;
         }
-
-
+        
         [HttpPost, Route("addProduct")]
         public bool AddProduct(ProductUpdate pro)
         {
             bool result = new CoffeeDAO().AddProduct(pro);
+            return result;
+        }
+
+        [HttpPost, Route("addCategory")]
+        public bool AddCategory(Category cat)
+        {
+            bool result = new CoffeeDAO().AddCategory(cat);
             return result;
         }
 
@@ -60,10 +66,24 @@ namespace CoffeeREST.Controllers
             return result;
         }
 
+        [HttpPut, Route("updateCategory")]
+        public bool UpdateCategory(Category cat)
+        {
+            bool result = new CoffeeDAO().UpdateCategory(cat);
+            return result;
+        }
+
         [HttpDelete, Route("deleteProduct")]
         public bool DeleteProductByIdProduct(int idProduct)
         {
             bool result = new CoffeeDAO().DeleteProductById(idProduct);
+            return result;
+        }
+
+        [HttpDelete, Route("deleteCategory")]
+        public bool DeleteCategoryByIdCat(int idCat)
+        {
+            bool result = new CoffeeDAO().DeleteCategoryByIdCat(idCat);
             return result;
         }
 
@@ -107,6 +127,15 @@ namespace CoffeeREST.Controllers
             return (Object)catProduct;
         }
 
+        [HttpGet, Route("getRating")]
+        public Object GetRating()
+        {
+            Category cat = new CoffeeDAO().SelectCatRating();
+            List<ProductTopping> products = new CoffeeDAO().SelectAllProductToppingByRating();
+            CatProductTopping catProduct = new CatProductTopping(products, cat);
+            return (Object)catProduct;
+        }
+
         [HttpGet, Route("getCatProToppingByNameIdCat")]
         public Object SelectCatProductToppingByName(string name)
         {
@@ -129,5 +158,6 @@ namespace CoffeeREST.Controllers
             List<Topping> listTop = new CoffeeDAO().SelectToppingByIdProduct(idProduct);
             return listTop;
         }
+
     }
 }
