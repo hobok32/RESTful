@@ -59,6 +59,13 @@ namespace CoffeeREST.Controllers
             return result;
         }
 
+        [HttpPost, Route("addAccount")]
+        public bool AddAccount(Account acc)
+        {
+            bool result = new CoffeeDAO().AddAccount(acc);
+            return result;
+        }
+
         [HttpPut, Route("updateProduct")]
         public bool UpdateProduct(ProductUpdate pro)
         {
@@ -73,6 +80,13 @@ namespace CoffeeREST.Controllers
             return result;
         }
 
+        [HttpPut, Route("updateAccount")]
+        public bool UpdateAccount(Account acc)
+        {
+            bool result = new CoffeeDAO().UpdateAccount(acc);
+            return result;
+        }
+
         [HttpDelete, Route("deleteProduct")]
         public bool DeleteProductByIdProduct(int idProduct)
         {
@@ -84,6 +98,13 @@ namespace CoffeeREST.Controllers
         public bool DeleteCategoryByIdCat(int idCat)
         {
             bool result = new CoffeeDAO().DeleteCategoryByIdCat(idCat);
+            return result;
+        }
+
+        [HttpDelete, Route("deleteAccount")]
+        public bool DeleteAccount(string idAccount)
+        {
+            bool result = new CoffeeDAO().DeleteAccount(idAccount);
             return result;
         }
 

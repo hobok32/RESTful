@@ -28,6 +28,7 @@ namespace CoffeeREST
                 acc.PasswordAccount = (string)dr["passwordAccount"];
                 acc.NameUser = (string)dr["nameUser"];
                 acc.PhoneNum = (string)dr["phoneNum"];
+                acc.Role = (string)dr["role"];
                 fruits.Add(acc);
             }
             con.Close();
@@ -290,7 +291,7 @@ namespace CoffeeREST
                 pro.PriceSmallProduct = null;
             MySqlConnection con = new MySqlConnection(strCon);
             con.Open();
-            string strCmd = "INSERT INTO Product VALUES (null, @idCat, @nameProduct, @priceSmallProduct, @priceMediumProduct, @priceLargeProduct, @priceProduct, @descriptionProduct, @imgProduct)";
+            string strCmd = "INSERT INTO Product VALUES (null, @idCat, @nameProduct, @priceSmallProduct, @priceMediumProduct, @priceLargeProduct, @priceProduct, @descriptionProduct, @imgProduct, 1)";
             MySqlCommand cmd = new MySqlCommand(strCmd, con);
             cmd.Parameters.Add(new MySqlParameter("@idCat", pro.IdCat));
             cmd.Parameters.Add(new MySqlParameter("@priceSmallProduct", pro.PriceSmallProduct));
@@ -555,6 +556,46 @@ namespace CoffeeREST
             MySqlCommand cmd = new MySqlCommand(strCmd, con);
             cmd.Parameters.Add(new MySqlParameter("@nameCat", cat.NameCat));
             cmd.Parameters.Add(new MySqlParameter("@imgCat", cat.ImgCat));
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+        //Thêm Account
+        public bool AddAccount(Account acc)
+        {
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "INSERT INTO account VALUES (@idAccount, @passwordAccount, @nameUser, @phoneNum, @role);";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idAccount", acc.IdAccount));
+            cmd.Parameters.Add(new MySqlParameter("@passwordAccount", acc.PasswordAccount));
+            cmd.Parameters.Add(new MySqlParameter("@nameUser", acc.NameUser));
+            cmd.Parameters.Add(new MySqlParameter("@phoneNum", acc.PhoneNum));
+            cmd.Parameters.Add(new MySqlParameter("@role", acc.Role));
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+        //Xóa Account
+        public bool DeleteAccount(string idAccount)
+        {
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "DELETE FROM account WHERE idAccount=@idAccount";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idAccount", idAccount));
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+        //Update Account
+        public bool UpdateAccount(Account acc)
+        {
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "UPDATE account SET nameUser=@nameUser, phoneNum=@phoneNum, role=@role WHERE idAccount=@idAccount";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@nameUser", acc.NameUser));
+            cmd.Parameters.Add(new MySqlParameter("@phoneNum", acc.PhoneNum));
+            cmd.Parameters.Add(new MySqlParameter("@role", acc.Role));
+            cmd.Parameters.Add(new MySqlParameter("@idAccount", acc.IdAccount));
             return cmd.ExecuteNonQuery() > 0;
         }
     }

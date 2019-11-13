@@ -11,6 +11,7 @@ namespace CoffeeREST
         public string PasswordAccount { set; get; }
         public string NameUser { set; get; }
         public string PhoneNum { set; get; }
+        public string Role { set; get; }
     }
     public class Product
     {
