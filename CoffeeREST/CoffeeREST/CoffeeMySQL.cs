@@ -12,6 +12,7 @@ namespace CoffeeREST
         public string NameUser { set; get; }
         public string PhoneNum { set; get; }
         public string Role { set; get; }
+        public string ImgAccount { set; get; }
     }
     public class Product
     {
@@ -53,6 +54,17 @@ namespace CoffeeREST
         }
         public List<Product> data { set; get; }
         public Category Category { set; get; }
+    }
+    public class AccountCheck
+    {
+        public AccountCheck(Account account, int result)
+        {
+            Account = account;
+            Result = result;
+        }
+
+        public Account Account { set; get; }
+        public int Result { set; get; }
     }
     public class Topping
     {

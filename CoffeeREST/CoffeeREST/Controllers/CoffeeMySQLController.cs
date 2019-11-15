@@ -180,5 +180,13 @@ namespace CoffeeREST.Controllers
             return listTop;
         }
 
+        [HttpPost, Route("checkSignIn")]
+        public Object CheckSignIn(Account acc)
+        {
+            int result = new CoffeeDAO().CheckSignIn(acc);
+            Account account = new CoffeeDAO().GetAccount(acc.IdAccount);
+            AccountCheck accountCheck = new AccountCheck(account, result);
+            return (Object)accountCheck;
+        }
     }
 }

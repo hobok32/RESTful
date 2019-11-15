@@ -8,11 +8,16 @@ PRIMARY KEY (idAccount)
 INSERT INTO account VALUES ('an.nd',123,N'Ân Nguyễn','0123456789');
 INSERT INTO account VALUES ('kiet.pa',321,N'Kiệt Phi','9876543210');
 
+select * from account
+
 create table Category (
 	idCat int not null auto_increment,
     nameCat nvarchar(20),
     primary key (idCat)
 );
+
+select * from category
+
 insert into category values (null, 'Coffee');
 insert into category values (null, 'Ice Blend');
 insert into category values (null, 'Fruit Tea');
@@ -22,6 +27,53 @@ insert into category values (null, 'Others');
 insert into category values (null, 'Topping');
 insert into category values (null, 'Snack');
 
+create table ProductTopping(
+	idPT int not null auto_increment,
+    idProduct int,
+    idTopping int,
+    primary key (idPT),
+    foreign key (idProduct) references Product (idProduct),
+    foreign key (idTopping) references Product (idProduct)
+);
+select * from producttopping;
+insert into producttopping values (null, 7, 46);
+insert into producttopping values (null, 8, 46);
+insert into producttopping values (null, 9, 46);
+insert into producttopping values (null, 10, 46);
+insert into producttopping values (null, 11, 46);
+insert into producttopping values (null, 12, 46);
+insert into producttopping values (null, 13, 46);
+insert into producttopping values (null, 14, 46);
+insert into producttopping values (null, 17, 46);
+insert into producttopping values (null, 18, 46);
+insert into producttopping values (null, 27, 47);
+insert into producttopping values (null, 29,49);
+insert into producttopping values (null, 30,48);
+insert into producttopping values (null, 31,49);
+insert into producttopping values (null, 32,49);
+insert into producttopping values (null, 33,50);
+insert into producttopping values (null, 34,50);
+insert into producttopping values (null, 35,51);
+insert into producttopping values (null, 35,52);
+insert into producttopping values (null, 36,52);
+insert into producttopping values (null, 39,51);
+insert into producttopping values (null, 39,48);
+insert into producttopping values (null, 40,51);
+insert into producttopping values (null, 40,48);
+insert into producttopping values (null, 41,51);
+insert into producttopping values (null, 41,48);
+
+
+select idProduct, nameProduct, priceProduct, imgProduct
+from product 
+where idProduct in (select b.idTopping
+from product a, producttopping b
+where a.idProduct=b.idProduct and a.idProduct=41 );
+
+SELECT * FROM product ORDER BY idProduct DESC LIMIT 1;
+select * from product;
+select * from producttopping;
+delete from producttopping where idProduct = 85;
 create table Product (
 	idProduct int not null auto_increment,
     idCat int not null,
@@ -56,6 +108,8 @@ insert into product values (null, 1, N'Cà Phê Đen Nóng', null, null, null, 3
 insert into product values (null, 1, N'Cà Phê Đen Đá', 29000, 35000, 39000, null, N'Một tách cà phê đen thơm ngào ngạt, phảng phát mùi cacao là món quà tự thưởng tuyệt vời nhất cho những ai mê đắm tính chất nguyên bản nhất của cà phê. Một tách cà phê trầm lắng, thi vị giữa dòng đời vồn vã.');
 insert into product values (null, 1, N'Bạc Xỉu Nóng', null, null, null, 35000, N'Theo chân những người gốc Hoa đến định cư tại Sài Gòn, Bạc sỉu là cách gọi tắt của "Bạc tẩy xỉu phé" trong tiếng Quảng Đông, chính là: Ly sữa trắng kèm một chút cà phê.');
 insert into product values (null, 1, N'Bạc Xỉu', 29000, 35000, 39000, null, N'Theo chân những người gốc Hoa đến định cư tại Sài Gòn, Bạc sỉu là cách gọi tắt của "Bạc tẩy xỉu phé" trong tiếng Quảng Đông, chính là: Ly sữa trắng kèm một chút cà phê.');
+
+
 
 insert into product values (null, 2, N'Phúc Bồn Tử Cam Đá Xay', null, 59000, 65000, null, N'Tê tái ngay đầu lưỡi bởi sự mát lạnh của đá xay. Hòa quyện thêm hương vị chua chua, ngọt ngọt từ trái cam tươi và trái phúc bồn tử 100% tự nhiên, để cho ra một hương vị thanh mát, kích thích vị giác đầy thú vị ngay từ lần đầu thưởng thức.');
 insert into product values (null, 2, N'Chanh Sả Đá Xay', null, 49000, 55000, null, N'Sự kết hợp giữa chanh, sả thơm lừng và đá đem lại cảm giác mát lạnh xua tán nóng bức của mùa hè.');
@@ -104,7 +158,41 @@ insert into product values (null, 8, N'Cơm Cháy Chà Bông', null, null, null,
 insert into product values (null, 8, N'Gạo Lứt Sấy Giòn', null, null, null, 10000, N'Gạo lứt giàu dinh dưỡng và cực ngon được rang theo nhiệt độ hợp lí để giữ nguyên hương vị thuần túy và các khoáng chất tốt cho sức khỏe.');
 
 
-select * from product
+select * from category;
+delete from producttopping where idProduct=66;
 
+select *
+from category a, product b
+where a.idCat = b.idCa
 
+select * from product;
+select * from category
+ALTER TABLE account ADD COLUMN role nvarchar(10);
 
+ALTER TABLE product ADD column rate int NOT NULL DEFAULT 1
+
+select t.idProduct, t.rate 
+from product t
+join (select max(rate) as mxitem from product) x
+on x.mxitem = t.rate
+
+create table Bill (
+	idBill int not null auto_increment,
+    idAccount VARCHAR(10) not null,
+    idxTable int,
+    dateBill date,
+    statusBill bool,
+    primary key (idBill),
+    foreign key (idAccount) references account (idAccount)
+);
+
+create table DetailBill(
+	idDetailBill int not null auto_increment,
+    idBill int not null,
+    idProduct int not null,
+    quantity int,
+    price int,
+    primary key (idDetailBill),
+    foreign key (idBill) references Bill (idBill),
+    foreign key (idProduct) references Product (idProduct)
+);

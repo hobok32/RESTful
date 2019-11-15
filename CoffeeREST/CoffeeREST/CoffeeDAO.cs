@@ -1,10 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
 using System.Configuration;
-using MySql.Data.MySqlClient;
+using System.Linq;
 
 namespace CoffeeREST
 {
@@ -564,13 +561,14 @@ namespace CoffeeREST
         {
             MySqlConnection con = new MySqlConnection(strCon);
             con.Open();
-            string strCmd = "INSERT INTO account VALUES (@idAccount, @passwordAccount, @nameUser, @phoneNum, @role);";
+            string strCmd = "INSERT INTO account VALUES (@idAccount, @passwordAccount, @nameUser, @phoneNum, @role, @imgAccount);";
             MySqlCommand cmd = new MySqlCommand(strCmd, con);
             cmd.Parameters.Add(new MySqlParameter("@idAccount", acc.IdAccount));
             cmd.Parameters.Add(new MySqlParameter("@passwordAccount", acc.PasswordAccount));
             cmd.Parameters.Add(new MySqlParameter("@nameUser", acc.NameUser));
             cmd.Parameters.Add(new MySqlParameter("@phoneNum", acc.PhoneNum));
             cmd.Parameters.Add(new MySqlParameter("@role", acc.Role));
+            cmd.Parameters.Add(new MySqlParameter("@imgAccount", acc.ImgAccount));
             return cmd.ExecuteNonQuery() > 0;
         }
 
@@ -597,6 +595,68 @@ namespace CoffeeREST
             cmd.Parameters.Add(new MySqlParameter("@role", acc.Role));
             cmd.Parameters.Add(new MySqlParameter("@idAccount", acc.IdAccount));
             return cmd.ExecuteNonQuery() > 0;
+        }
+
+        //Lấy tài khoản = idAccount
+        public Account GetAccount(string idAccount)
+        {
+            Account accCheck = new Account();
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "SELECT * from account where idAccount = @idAccount";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idAccount", idAccount));
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                accCheck.IdAccount = (string)dr["idAccount"];
+                accCheck.PasswordAccount = (string)dr["passwordAccount"];
+                accCheck.Role = (string)dr["Role"];
+                accCheck.NameUser = (string)dr["nameUser"];
+                accCheck.ImgAccount = (string)dr["imgAccount"];
+                accCheck.PhoneNum = (string)dr["phoneNum"];
+            }
+            con.Close();
+            return accCheck;
+        }
+
+        //Check đăng nhập
+        public int CheckSignIn(Account acc)
+        {
+            Account accCheck = new Account();
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "SELECT * from account where idAccount = @idAccount";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idAccount", acc.IdAccount));
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                accCheck.IdAccount = (string)dr["idAccount"];
+                accCheck.PasswordAccount = (string)dr["passwordAccount"];
+                accCheck.Role = (string)dr["Role"];
+            }
+            if (accCheck.IdAccount == null)
+                return 0;
+            else
+            {
+                if (acc.PasswordAccount == accCheck.PasswordAccount)
+                {
+                    switch (accCheck.Role)
+                    {
+                        case "Admin":
+                            return 2;
+                        case "Staff":
+                            return 3;
+                        case "Kitchen":
+                            return 4;
+                        default:
+                            return 5;
+                    }
+                }
+                else
+                    return 1;
+            }
         }
     }
 }
