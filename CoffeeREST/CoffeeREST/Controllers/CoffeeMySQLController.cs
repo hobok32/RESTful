@@ -52,6 +52,13 @@ namespace CoffeeREST.Controllers
             return result;
         }
 
+        [HttpPost, Route("addBillAndDetailBill")]
+        public int AddBillAndDetailBill(Bill bill)
+        {
+            int result = new CoffeeDAO().AddBillAndDetailBill(bill);
+            return result;
+        }
+
         [HttpPost, Route("addCategory")]
         public bool AddCategory(Category cat)
         {
@@ -187,6 +194,14 @@ namespace CoffeeREST.Controllers
             Account account = new CoffeeDAO().GetAccount(acc.IdAccount);
             AccountCheck accountCheck = new AccountCheck(account, result);
             return (Object)accountCheck;
+        }
+
+        [HttpGet, Route("getDetailBill")]
+        public List<DetailBill> GetDetailBills(int idTable)
+        {
+            int idBill = new CoffeeDAO().SelectIdBillByIdTable(idTable);
+            List<DetailBill> detailBills = new CoffeeDAO().SelectDetailBillByIdBill(idBill);
+            return detailBills;
         }
     }
 }

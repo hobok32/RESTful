@@ -18,7 +18,7 @@ namespace CoffeeREST
             string strCmd = "SELECT * FROM Account";
             MySqlCommand cmd = new MySqlCommand(strCmd, con);
             MySqlDataReader dr = cmd.ExecuteReader();
-            while (dr.Read())
+            while (dr.Read())   
             {
                 Account acc = new Account();
                 acc.IdAccount = (string)dr["idAccount"];
@@ -657,6 +657,215 @@ namespace CoffeeREST
                 else
                     return 1;
             }
+        }
+
+        //Add bill & detail bill
+        public int AddBillAndDetailBill(Bill billDetailBill)
+        {
+            int q1 = 0;
+            int q2 = 0;
+            int q5 = 0;
+            int newIdBill = 0;
+            int newIdDetailBill = 0;
+            List<int> q3 = new List<int>();
+            int q4 = 0;
+
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "insert into bill values (null,@idAccount, @idxTable, now(), 0);";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idAccount", billDetailBill.IdAccount));
+            cmd.Parameters.Add(new MySqlParameter("@idxTable", billDetailBill.IdxTable));
+            if (cmd.ExecuteNonQuery() > 0)
+                q1 = 1;
+            con.Close();
+
+            MySqlConnection con5 = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd5 = "update tablewinform set statusTable = N'Có người' where idTable = @idTable";
+            MySqlCommand cmd5 = new MySqlCommand(strCmd5, con);
+            cmd5.Parameters.Add(new MySqlParameter("@idTable", billDetailBill.IdxTable));
+            if (cmd5.ExecuteNonQuery() > 0)
+                q5 = 1;
+            con5.Close();
+
+            MySqlConnection con1 = new MySqlConnection(strCon);
+            con1.Open();
+            string strCmd2 = "SELECT * FROM bill ORDER BY idBill DESC LIMIT 1;";
+            MySqlCommand cmd2 = new MySqlCommand(strCmd2, con1);
+            MySqlDataReader dr = cmd2.ExecuteReader();
+            while (dr.Read())
+            {
+                newIdBill = (int)dr["idBill"];
+            }
+            if (newIdBill != 0)
+                q2 = 1;
+            con1.Close();
+
+            MySqlConnection con2 = new MySqlConnection(strCon);
+            con2.Open();
+            for (int i = 0; i < billDetailBill.DetailBills.Count(); i++)
+            {
+                for (int j = 0; j < billDetailBill.DetailBills[i].Topping.Count(); j++)
+                {
+                    if (j == 0)
+                    {
+                        string strCmd1 = "INSERT INTO detailbill VALUES (null, @idBill, @idProduct, @quantity, @price, @idTopping, @priceTopping, null);";
+                        MySqlCommand cmd1 = new MySqlCommand(strCmd1, con2);
+                        cmd1.Parameters.Add(new MySqlParameter("@idBill", newIdBill));
+                        cmd1.Parameters.Add(new MySqlParameter("@idProduct", billDetailBill.DetailBills[i].IdProduct));
+                        cmd1.Parameters.Add(new MySqlParameter("@quantity", billDetailBill.DetailBills[i].Quantity));
+                        cmd1.Parameters.Add(new MySqlParameter("@price", billDetailBill.DetailBills[i].Price));
+                        cmd1.Parameters.Add(new MySqlParameter("@idTopping", billDetailBill.DetailBills[i].Topping[j].IdProduct));
+                        cmd1.Parameters.Add(new MySqlParameter("@priceTopping", billDetailBill.DetailBills[i].Topping[j].PriceProduct));
+                        if (cmd1.ExecuteNonQuery() > 0)
+                            q3.Add(1);
+                        else
+                            q3.Add(0);
+                    }
+                    else
+                    {
+                        MySqlConnection conn = new MySqlConnection(strCon);
+                        conn.Open();
+                        string strCmdd = "SELECT idDetailBill FROM detailbill ORDER BY idDetailBill DESC LIMIT 1;";
+                        MySqlCommand cmdd = new MySqlCommand(strCmdd, conn);
+                        MySqlDataReader drr = cmdd.ExecuteReader();
+                        while (drr.Read())
+                        {
+                            newIdDetailBill = (int)drr["idDetailBill"];
+                        }
+                        conn.Close();
+                        if (newIdDetailBill != 0)
+                        {
+                            string strCmd1 = "INSERT INTO detailbill VALUES (null, @idBill, @idProduct, @quantity, @price, @idTopping, @priceTopping, @idDetailBill);";
+                            MySqlCommand cmd1 = new MySqlCommand(strCmd1, con2);
+                            cmd1.Parameters.Add(new MySqlParameter("@idBill", newIdBill));
+                            cmd1.Parameters.Add(new MySqlParameter("@idProduct", billDetailBill.DetailBills[i].IdProduct));
+                            cmd1.Parameters.Add(new MySqlParameter("@quantity", billDetailBill.DetailBills[i].Quantity));
+                            cmd1.Parameters.Add(new MySqlParameter("@price", billDetailBill.DetailBills[i].Price));
+                            cmd1.Parameters.Add(new MySqlParameter("@idTopping", billDetailBill.DetailBills[i].Topping[j].IdProduct));
+                            cmd1.Parameters.Add(new MySqlParameter("@priceTopping", billDetailBill.DetailBills[i].Topping[j].PriceProduct));
+                            cmd1.Parameters.Add(new MySqlParameter("@idDetailBill", newIdDetailBill));
+                            if (cmd1.ExecuteNonQuery() > 0)
+                                q3.Add(1);
+                            else
+                                q3.Add(0);
+                        }
+                    }
+                   
+                }
+               
+            }
+            con2.Close();
+
+            for (int i = 0; i < q3.Count(); i++)
+            {
+                if (q3[i] == 0)
+                {
+                    q4 = 0;
+                    break;
+                }
+                else
+                    q4 = 1;
+            }
+
+            if (q1 == 1 && q2 == 1 && q4 == 1 && q5 == 1)
+                return 1;//Add vào bill và detailBill + sửa status bàn thành công
+            else if (q4 != 1)
+                return 2;//Không add detailBill được
+            else if (q5 != 1)
+                return 3;//Không sửa status bàn được
+            else if (q1 != 1)
+                return 0;//Không add bill được
+            else
+                return 9999;//?!?
+        }
+
+        //Lấy id hóa đơn chưa thanh toán của bàn 
+        public int SelectIdBillByIdTable(int idTable)
+        {
+            int idBill = 0;
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "select * from bill where idxTable = '" + idTable + "' and statusBill=0";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                idBill = dr.IsDBNull(dr.GetOrdinal("idBill")) ? 0 : (int)dr["idBill"];
+            }
+            con.Close();
+            return idBill;
+        }
+
+        //Lấy chi tiết hóa đơn
+        public List<DetailBill> SelectDetailBillByIdBill(int idBill)
+        {
+            int temp = 0;
+            int tempIdProduct = 0;
+            int i = 0;
+            List<DetailBill> detailBills = new List<DetailBill>();
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "select * from detailbill where idBill = '" + idBill + "' order by idBill, idProduct asc;";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                DetailBill detailBill = new DetailBill();
+                detailBill.IdDetailBill = (int)dr["idDetailBill"];
+                detailBill.IdProduct = (int)dr["idProduct"];
+                detailBill.IdBill = idBill;
+                if (tempIdProduct != (int)dr["idProduct"])
+                {
+                    temp = (int)dr["idDetailBill"];
+                    detailBill.IdProduct = (int)dr["idProduct"];
+                    tempIdProduct = (int)dr["idProduct"]; 
+                    detailBill.Quantity = (int)dr["quantity"];
+                    detailBill.Price = (int)dr["price"];
+                    ToppingDetail topping = new ToppingDetail
+                    {
+                        IdProduct = (int)dr["idTopping"],
+                        PriceProduct = (int)dr["priceTopping"]
+                    };
+                    detailBill.Topping.Add(topping);
+                    i=0;
+                    detailBills.Add(detailBill);
+                }
+                else
+                {
+                    int unique = 0;
+                    unique = dr.IsDBNull(dr.GetOrdinal("uniqueDetailBill")) ? 0 : (int)dr["uniqueDetailBill"];
+                    if (temp == unique)
+                    {
+                        i++;
+                        ToppingDetail topping = new ToppingDetail
+                        {
+                            IdProduct = (int)dr["idTopping"],
+                            PriceProduct = (int)dr["priceTopping"]
+                        };
+                        detailBills[i - 1].Topping.Add(topping);
+                    }
+                    else
+                    {
+                        temp = (int)dr["idDetailBill"];
+                        detailBill.IdProduct = (int)dr["idProduct"];
+                        tempIdProduct = (int)dr["idProduct"];
+                        detailBill.Quantity = (int)dr["quantity"];
+                        detailBill.Price = (int)dr["price"];
+                        ToppingDetail topping = new ToppingDetail
+                        {
+                            IdProduct = (int)dr["idTopping"],
+                            PriceProduct = (int)dr["priceTopping"]
+                        };
+                        detailBill.Topping.Add(topping);
+                        i = 0;
+                        detailBills.Add(detailBill);
+                    }
+                }
+            }
+            con.Close();
+            return detailBills;
         }
     }
 }

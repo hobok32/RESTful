@@ -5,6 +5,44 @@ using System.Web;
 
 namespace CoffeeREST
 {
+    public class Bill
+    {
+        public int IdBill { set; get; }
+        public string IdAccount { set; get; }
+        public int IdxTable { set; get; }
+        public DateTime DateBill { set; get; }
+        public bool StatusBill { set; get; }
+        public List<DetailBill> DetailBills { set; get; }
+    }
+    public class DetailBill
+    {
+        public int IdDetailBill { set; get; }
+        public int IdBill { set; get; }
+        public int IdProduct { set; get; }
+        public int Quantity { set; get; }
+        public int Price { set; get; }
+        public List<ToppingDetail> Topping = new List<ToppingDetail>();
+    }
+
+    public class ToppingDetail
+    {
+        public int IdProduct { set; get; }
+        public int PriceProduct { set; get; }
+    }
+
+    public class BillDetailBill
+    {
+        public BillDetailBill(Bill bill, List<DetailBill> detailBills)
+        {
+            Bill = bill;
+            DetailBills = detailBills;
+        }
+
+        public Bill Bill { set; get; }
+        public List<DetailBill> DetailBills { set; get; }
+    }
+
+
     public class Account
     {
         public string IdAccount { set; get; }
