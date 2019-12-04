@@ -1,8 +1,14 @@
-﻿using System;
+﻿
+using FireSharp;
+using FireSharp.Config;
+using FireSharp.Interfaces;
+using FireSharp.Response;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace CoffeeREST.Controllers
@@ -64,6 +70,116 @@ namespace CoffeeREST.Controllers
         {
             bool result = new CoffeeDAO().AddCategory(cat);
             return result;
+        }
+
+        [HttpPost, Route("addProductToBill")]
+        public bool AddProductToBill(AddProductToBill addProductToBill)
+        {
+            IFirebaseConfig config = new FirebaseConfig
+            {
+                AuthSecret = "dHDi653cpD0hHaOOrAwgtlTahn7FC9ZBhYoDjeWV",
+                BasePath = "https://cafe-4b7dd.firebaseio.com/"
+            };
+
+            IFirebaseClient client = new FirebaseClient(config);
+            if (client==null)
+            {
+                return false;
+            }
+            else
+            {
+                int idBill = new CoffeeDAO().SelectIdBill(addProductToBill.IdTable);
+                if (idBill == -1)
+                {
+                    bool result1 = new CoffeeDAO().AddBill(addProductToBill.IdTable, addProductToBill.IdAccount);
+                    if (result1)
+                    {
+                        bool result2 = new CoffeeDAO().UpdateStatusTable(addProductToBill.IdTable, "Có người");
+                        if (result2)
+                        {
+                            for (int i = 0; i < addProductToBill.Product.Count(); i++)
+                            {
+                                int id = new CoffeeDAO().SelectIdBillLast();
+                                bool result3 = new CoffeeDAO().AddDetailBill(id, addProductToBill.Product[i].IdProduct, addProductToBill.Product[i].Quantity, addProductToBill.Product[i].PriceProduct, addProductToBill.Product[i].toppingAdds);
+                                if (result3==false)
+                                    return false;
+                            }
+                            _ = EditStatusTableFirebase(addProductToBill.IdTable, addProductToBill.NameTable, "Có người", client);
+                            return true;
+                        }
+                        else
+                            return false;
+                    }
+                    else
+                        return false;
+                }
+                //Bill đã tồn tại
+                else
+                {
+                    //Xóa hết
+                    List<int> idDetailBills = new CoffeeDAO().SelectIdDetailBill(idBill);
+                    if (idDetailBills.Count > 0)
+                    {
+                        for (int i = 0; i < idDetailBills.Count(); i++)
+                        {
+                            List<int> idDetailTopping = new CoffeeDAO().SelectIdDetailTopping(idDetailBills[i]);
+                            if (idDetailTopping.Count > 0)
+                            {
+                                for(int j = 0; j < idDetailTopping.Count; j++)
+                                {
+                                    bool result0 = new CoffeeDAO().DeleteDetailTopping(idDetailTopping[j]);
+                                    if (result0 == false)
+                                        return false;
+                                }
+                            }
+                            bool result = new CoffeeDAO().DeleteDetailBill(idDetailBills[i]);
+                            if (result == false)
+                                return false;
+                        }
+                    }
+                    _ = EditStatusTableFirebase(addProductToBill.IdTable, addProductToBill.NameTable, "Trống", client);
+                    bool result11 = new CoffeeDAO().XoaBill(idBill);
+                    if (result11)
+                    //Add lại
+                    {
+                        bool result1 = new CoffeeDAO().AddBill(addProductToBill.IdTable, addProductToBill.IdAccount);
+                        if (result1)
+                        {
+                            bool result2 = new CoffeeDAO().UpdateStatusTable(addProductToBill.IdTable, "Có người");
+                            if (result2)
+                            {
+                                for (int i = 0; i < addProductToBill.Product.Count(); i++)
+                                {
+                                    int id = new CoffeeDAO().SelectIdBillLast();
+                                    bool result3 = new CoffeeDAO().AddDetailBill(id, addProductToBill.Product[i].IdProduct, addProductToBill.Product[i].Quantity, addProductToBill.Product[i].PriceProduct, addProductToBill.Product[i].toppingAdds);
+                                    if (result3 == false)
+                                        return false;
+                                }
+                                _ = EditStatusTableFirebase(addProductToBill.IdTable, addProductToBill.NameTable, "Có người", client);
+                                return true;
+                            }
+                            else
+                                return false;
+                        }
+                        else
+                            return false;
+                    }
+                    else
+                        return false;
+                }
+            }
+        }
+
+        private async Task EditStatusTableFirebase(int idTable, string nameTable, string status, IFirebaseClient client)
+        {
+            var data = new Table
+            {
+                IdTable = idTable,
+                NameTable = nameTable,
+                StatusTable = status
+            };
+            FirebaseResponse response = await client.UpdateTaskAsync("Tables/L1/B" + idTable, data);
+            await Task.Delay(100);
         }
 
         [HttpPost, Route("addAccount")]

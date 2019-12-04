@@ -77,6 +77,15 @@ namespace CoffeeREST
         public string imgProduct { set; get; }
         public List<int> IdTopping { set; get; }
     }
+
+    public class ProductAdd
+    {
+        public int IdProduct { set; get; }
+        public int PriceProduct { set; get; }
+        public int Quantity { set; get; }
+        public List<ToppingAdd> toppingAdds { set; get; }
+    }
+
     public class Category
     {
         public int IdCat { set; get; }
@@ -93,6 +102,21 @@ namespace CoffeeREST
         public List<Product> data { set; get; }
         public Category Category { set; get; }
     }
+    public class ToppingAdd
+    {
+        public int IdTopping { set; get; }
+        public int PriceTopping  { set; get; }
+        public int Quantity { set; get; }
+    }
+    public class AddProductToBill
+    {
+
+        public int IdTable { set; get; }
+        public string NameTable { set; get; }
+        public string IdAccount { set; get; }
+        public List<ProductAdd> Product { set; get; }
+    }
+
     public class AccountCheck
     {
         public AccountCheck(Account account, int result)
@@ -110,6 +134,7 @@ namespace CoffeeREST
         public string NameProduct { set; get; }
         public int PriceProduct { set; get; }
         public string ImgProduct { set; get; }
+        public int Quantity { set; get; }
     }
     public class CatProductTopping
     {

@@ -1,6 +1,8 @@
-﻿using MySql.Data.MySqlClient;
+﻿
+using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Linq;
 
 namespace CoffeeREST
@@ -866,6 +868,121 @@ namespace CoffeeREST
             }
             con.Close();
             return detailBills;
+        }
+
+        ////THÊM MÓN////
+        ////Bill tồn tại? -> Check Bill + Add Bill + UpdateStatusTable////
+        ///Check Bill
+        public int SelectIdBill(int id)
+        {
+            DataTable data = DataProvider.Instance.ExecuteQuery("SELECT * FROM Bill WHERE idxTable='" + id + "'AND statusBill=0");
+
+            if (data.Rows.Count > 0)
+            {
+                BillData bill = new BillData(data.Rows[0]);
+                return bill.IdBill;
+            }
+            else
+                return -1;
+        }
+        ///Add Bill (SelectIdBill() == -1)
+        public bool AddBill(int idxTable, string idAccount)
+        {
+            string strCmd = "INSERT INTO bill VALUES (null, @idAccount , @idxTable , now(), 0, 0, 0);";
+            return DataProvider.Instance.ExecuteNonQuery(strCmd, new object[] { idAccount, idxTable }) > 0;
+        }
+        //XoaBill
+        public bool XoaBill(int idBill)
+        {
+            string strCmd = "DELETE FROM bill WHERE idBill = " + idBill;
+            return DataProvider.Instance.ExecuteNonQuery(strCmd) > 0;
+        }
+        public bool DeleteDetailBill(int del)
+        {
+            string strCmd = "DELETE FROM detailbill WHERE idDetailBill = " + del;
+            return DataProvider.Instance.ExecuteNonQuery(strCmd) > 0;
+        }
+        public bool DeleteDetailTopping (int del)
+        {
+            string strCmd = "DELETE FROM detailtopping WHERE idDetailTopping = " + del;
+            return DataProvider.Instance.ExecuteNonQuery(strCmd) > 0;
+        }
+        public List<int> SelectIdDetailBill(int idBill)
+        {
+            List<int> idDetailBill = new List<int>();
+            DataTable data = DataProvider.Instance.ExecuteQuery("SELECT * FROM detailbill WHERE idBill = " + idBill);
+            foreach (DataRow item in data.Rows)
+            {
+                LTGD_Project.DTO.DetailBill detail = new LTGD_Project.DTO.DetailBill(item);
+                idDetailBill.Add(detail.IdDeTailBill);
+            }
+            return idDetailBill;
+        }
+        public List<int> SelectIdDetailTopping(int idDetailBill)
+        {
+            List<int> idDetailTopping = new List<int>();
+            DataTable data = DataProvider.Instance.ExecuteQuery("SELECT * FROM detailtopping WHERE idDetailBill = " + idDetailBill);
+            foreach (DataRow item in data.Rows)
+            {
+                LTGD_Project.DTO.DetailTopping detail = new LTGD_Project.DTO.DetailTopping(item);
+                idDetailTopping.Add(detail.IdDetailTopping);
+            }
+            return idDetailTopping;
+        }
+        ///UpdateStatusBill
+        public bool UpdateStatusTable(int idxTable, string status)//status = 'Trống' || 'Có người'
+        {
+            string strCmd = "update tablewinform set statusTable = @statusTable where idTable = @idTable ";
+            return DataProvider.Instance.ExecuteNonQuery(strCmd, new object[] { status, idxTable }) > 0;
+        }
+        ///Edit status firebase
+        ///AddDetailBill
+        public bool AddDetailBill(int idBill, int idProduct, int quantity, int price, List<ToppingAdd> toppings)
+        {
+            string strCmd = "INSERT INTO detailbill VALUES (null, @idBill , @idProduct , @quantity , @price );";
+            string strCmdTopping = "INSERT INTO detailtopping VALUES (null, @idDetailBill , @idTopping , @quantityTopping , @priceTopping );";
+            bool result = DataProvider.Instance.ExecuteNonQuery(strCmd, new object[] { idBill, idProduct, quantity, price }) > 0;
+            if (result)
+            {
+                int idDetailBill = SelectIdDetailBillLast();
+                for (int i = 0; i < toppings.Count(); i++)
+                {
+                    bool result1 = DataProvider.Instance.ExecuteNonQuery(strCmdTopping, new object[] { idDetailBill, toppings[i].IdTopping, toppings[i].Quantity, toppings[i].PriceTopping }) > 0;
+                    if (result1 == false)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else
+                return false;
+        }
+        //Lấy detail Bill mới nhất
+        public int SelectIdDetailBillLast()
+        {
+            string strCmd2 = "SELECT idDetailBill FROM detailbill ORDER BY idDetailBill DESC LIMIT 1;";
+            try
+            {
+                return (int)DataProvider.Instance.ExecuteScalar(strCmd2);
+            }
+            catch
+            {
+                return 1;
+            }
+        }
+        //Lấy bill mới nhất
+        public int SelectIdBillLast()
+        {
+            string strCmd2 = "SELECT idBill FROM bill ORDER BY idBill DESC LIMIT 1;";
+            try
+            {
+                return (int)DataProvider.Instance.ExecuteScalar(strCmd2);
+            }
+            catch
+            {
+                return 1;
+            }
         }
     }
 }
