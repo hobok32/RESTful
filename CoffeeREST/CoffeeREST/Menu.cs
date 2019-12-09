@@ -20,6 +20,7 @@ namespace CoffeeREST
         public int? QuantityTopping { set; get; }
         public int? PriceTopping { set; get; }
         public string NameTopping { set; get; }
+        public string Size { set; get; }
 
         public Menu(DataRow row)
         {
@@ -58,6 +59,12 @@ namespace CoffeeREST
                 this.IdDetailTopping = (int?)IdDetailToppingTemp;
             else
                 this.IdDetailTopping = 0;
+
+            var SizeTemp = row["size"];
+            if (SizeTemp.ToString() != "")
+                this.Size = (string)SizeTemp;
+            else
+                this.Size = "???";
 
         }
     }

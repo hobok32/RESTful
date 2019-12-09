@@ -989,9 +989,9 @@ namespace CoffeeREST
         {
             List<Menu> menus = new List<Menu>();
 
-            string query = "select a.idProduct, a.nameProduct, b.quantity, b.price, b.iddetailbill, null as idDetailTopping, null as idTopping, null as quantityTopping, null as priceTopping, null as nameTopping from product a, (select * from detailbill where idBill = (select idBill from bill a, tablewinform b where a.idxTable = b.idTable and b.idTable = " + idTable + " and a.statusBill = 0)) b where a.idProduct = b.idProduct; ";
+            string query = "select a.*, if(a.price=b.priceSmallProduct,'S',if(a.price=b.priceMediumProduct,'M',if(a.price=b.priceLargeProduct,'L',if(a.price=b.priceProduct,'F','???')))) as size from(select a.idProduct, a.idCat, a.nameProduct, b.quantity, b.price, b.iddetailbill, null as idDetailTopping, null as idTopping, null as quantityTopping, null as priceTopping, null as nameTopping from product a, (select * from detailbill where idBill = (select idBill from bill a, tablewinform b where a.idxTable = b.idTable and b.idTable = "+idTable+" and a.statusBill = 0)) b where a.idProduct = b.idProduct) a, product b where a.idProduct = b.idProduct";
 
-            string queryTopping = "select b.*, a.nameProduct as nameTopping from product a, (select a.idProduct, a.nameProduct, b.quantity, b.price, b.iddetailbill, c.idDetailTopping, c.idTopping, c.quantityTopping, c.priceTopping from product a, (select * from detailbill where idBill = (select idBill from bill a, tablewinform b where a.idxTable = b.idTable and b.idTable = " + idTable + " and a.statusBill = 0)) b, detailtopping c where a.idProduct = b.idProduct and b.idDetailBill = c.idDetailBill) b where a.idProduct = b.idTopping";
+            string queryTopping = "select b.*, a.nameProduct as nameTopping, null as size from product a, (select a.idProduct, a.nameProduct, b.quantity, b.price, b.iddetailbill, c.idDetailTopping, c.idTopping, c.quantityTopping, c.priceTopping from product a, (select * from detailbill where idBill = (select idBill from bill a, tablewinform b where a.idxTable = b.idTable and b.idTable = " + idTable + " and a.statusBill = 0)) b, detailtopping c where a.idProduct = b.idProduct and b.idDetailBill = c.idDetailBill) b where a.idProduct = b.idTopping";
 
             DataTable data = DataProvider.Instance.ExecuteQuery(query);
 
