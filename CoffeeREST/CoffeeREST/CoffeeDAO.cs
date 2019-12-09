@@ -123,6 +123,39 @@ namespace CoffeeREST
             return products;
         }
 
+        //Lấy tất cả sản phẩm + topping theo idProduct
+        public ProductTopping SelectAllProductToppingByIdPro(int idProduct)
+        {
+            ProductTopping pro = new ProductTopping();
+            MySqlConnection con = new MySqlConnection(strCon);
+            con.Open();
+            string strCmd = "SELECT * FROM Product WHERE idProduct=@idProduct";
+            MySqlCommand cmd = new MySqlCommand(strCmd, con);
+            cmd.Parameters.Add(new MySqlParameter("@idProduct", idProduct));
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                pro.IdProduct = (int)dr["idProduct"];
+                pro.IdCat = (int)dr["idCat"];
+                pro.NameProduct = (string)dr["nameProduct"];
+                pro.PriceLargeProduct = (dr.IsDBNull(dr.GetOrdinal("priceLargeProduct"))) ? null : (int?)dr["priceLargeProduct"];
+                pro.PriceMediumProduct = (dr.IsDBNull(dr.GetOrdinal("priceMediumProduct"))) ? null : (int?)dr["priceMediumProduct"];
+                pro.PriceSmallProduct = (dr.IsDBNull(dr.GetOrdinal("priceSmallProduct"))) ? null : (int?)dr["priceSmallProduct"];
+                pro.PriceProduct = (dr.IsDBNull(dr.GetOrdinal("priceProduct"))) ? null : (int?)dr["priceProduct"];
+                pro.DescriptionProduct = (dr.IsDBNull(dr.GetOrdinal("descriptionProduct"))) ? "Không có mô tả" : (string)dr["descriptionProduct"];
+                pro.imgProduct = (dr.IsDBNull(dr.GetOrdinal("imgProduct"))) ? "Không có hình" : (string)dr["imgProduct"];
+                pro.rating = (int)dr["rate"];
+
+                List<Topping> top = SelectToppingByIdProduct((int)dr["idProduct"]);
+                pro.Topping = top;
+                
+
+            }
+            con.Close();
+            return pro;
+        }
+
+
         //Lấy tất cả sản phẩm + topping theo Rating
         public List<ProductTopping> SelectAllProductToppingByRating()
         {
@@ -216,6 +249,7 @@ namespace CoffeeREST
             con.Close();
             return products;
         }
+
 
         //Tìm kiếm sản phẩm trong 1 list Category bằng tên
         public List<Product> SearchProductInCatByName(int idCat, string keyword)
@@ -1022,6 +1056,18 @@ namespace CoffeeREST
             }
             List<Menu> sortMenus = menus.OrderBy(o => o.IdDetailBill).ToList();
             return sortMenus;
+        }
+
+        public List<LTGD_Project.DTO.Table> getAllTable()
+        {
+            List<LTGD_Project.DTO.Table> tables = new List<LTGD_Project.DTO.Table>();
+            DataTable data = DataProvider.Instance.ExecuteQuery("SELECT * FROM tablewinform");
+            foreach (DataRow item in data.Rows)
+            {
+                LTGD_Project.DTO.Table table = new LTGD_Project.DTO.Table(item);
+                tables.Add(table);
+            }
+            return tables;
         }
     }
 }

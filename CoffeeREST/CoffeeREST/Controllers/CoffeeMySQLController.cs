@@ -296,6 +296,13 @@ namespace CoffeeREST.Controllers
             return (Object)listCatProduct;
         }
 
+        [HttpGet, Route("getProductToppingByIdPro")]
+        public ProductTopping SelectCatProductToppingByName(int idProduct)
+        {
+            ProductTopping product = new CoffeeDAO().SelectAllProductToppingByIdPro(idProduct);
+            return product;
+        }
+
         [HttpGet, Route("getToppingByIdProduct")]
         public List<Topping> SelectToppingByIdProduct(int idProduct)
         {
@@ -325,6 +332,13 @@ namespace CoffeeREST.Controllers
         {
             List<Menu> detailBills = new CoffeeDAO().SelectMenu(idTable);
             return detailBills;
+        }
+
+        [HttpGet, Route("getAllTable")]
+        public List<LTGD_Project.DTO.Table> GetAllTable()
+        {
+            List<LTGD_Project.DTO.Table> tables = new CoffeeDAO().getAllTable();
+            return tables;
         }
     }
 }
