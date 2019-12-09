@@ -1,0 +1,19 @@
+﻿▪
+The RPA CoE is a pool of capabilities required to drive all the functionalities
+of an RPA initiative. The CoE functionalities and their processes are:
+ic                                                                                                                                                      9, ,
+T                                                                                 I
+000                                                                                                                                                     L
+Organization                                                                                                                                            Governance
+                                                                                  • Integration into the overall corporation organizational structure   Escalation paths
+                                                                                  Internal and external roles and responsibilities to support the       • Compliance to policies and procedures
+                                                                                  functionalities of the RPA initiative                                 • System accesses
+                                                                                  • Training of new resources                                           • Process prioritization
+                                                                                  • Change management
+                                                                                  51
+Technology                                                                        Processes                                                             Operations
+I Architecture for the robotic operating                                          Assessment                                                            • Maintenance of existing
+environment (ROE)                                                                 • Development                                                         automated processes
+• Infrastructure support                                                          • Testing                                                             * Support
+• Technology choice and licenses                                                  • Deployment                                                          * Monitoring
+Development standards

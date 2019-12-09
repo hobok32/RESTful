@@ -319,5 +319,12 @@ namespace CoffeeREST.Controllers
             List<DetailBill> detailBills = new CoffeeDAO().SelectDetailBillByIdBill(idBill);
             return detailBills;
         }
+
+        [HttpGet, Route("getDetailBillByIdTable")]
+        public List<Menu> GetDetailBillByIdTable(int idTable)
+        {
+            List<Menu> detailBills = new CoffeeDAO().SelectMenu(idTable);
+            return detailBills;
+        }
     }
 }
