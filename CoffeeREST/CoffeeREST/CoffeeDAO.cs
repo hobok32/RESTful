@@ -1055,6 +1055,17 @@ namespace CoffeeREST
                 }
             }
             List<Menu> sortMenus = menus.OrderBy(o => o.IdDetailBill).ToList();
+            for (int x = 0; x < sortMenus.Count(); x++)
+            {
+                if (x < sortMenus.Count - 1)
+                {
+                    if (sortMenus[x].IdDetailBill == sortMenus[x + 1].IdDetailBill && sortMenus[x].IdDetailTopping == sortMenus[x + 1].IdDetailTopping)
+                    {
+                        sortMenus.RemoveAt(x + 1);
+                        x--;
+                    }
+                }
+            }
             return sortMenus;
         }
 
