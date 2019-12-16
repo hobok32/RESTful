@@ -105,6 +105,7 @@ namespace CoffeeREST.Controllers
                                     return false;
                             }
                             _ = EditStatusTableFirebase(addProductToBill.IdTable, addProductToBill.NameTable, "Có người", client);
+                            _ = EditNoteTableFirebase(client, addProductToBill.IdTable, addProductToBill.Note);
                             return true;
                         }
                         else
@@ -156,6 +157,7 @@ namespace CoffeeREST.Controllers
                                         return false;
                                 }
                                 _ = EditStatusTableFirebase(addProductToBill.IdTable, addProductToBill.NameTable, "Có người", client);
+                                _ = EditNoteTableFirebase(client, addProductToBill.IdTable, addProductToBill.Note);
                                 return true;
                             }
                             else
@@ -179,6 +181,16 @@ namespace CoffeeREST.Controllers
                 StatusTable = status
             };
             FirebaseResponse response = await client.UpdateTaskAsync("Tables/L1/B" + idTable, data);
+            await Task.Delay(100);
+        }
+
+        private async Task EditNoteTableFirebase(IFirebaseClient client, int idTable, string note)
+        {
+            var notes = new LTGD_Project.Note
+            {
+                Notes = note
+            };
+            FirebaseResponse response = await client.UpdateTaskAsync("OrderBills/B" + idTable, notes);
             await Task.Delay(100);
         }
 
@@ -328,10 +340,12 @@ namespace CoffeeREST.Controllers
         }
 
         [HttpGet, Route("getDetailBillByIdTable")]
-        public List<Menu> GetDetailBillByIdTable(int idTable)
+        public Object GetDetailBillByIdTable(int idTable)
         {
             List<Menu> detailBills = new CoffeeDAO().SelectMenu(idTable);
-            return detailBills;
+            string note = new CoffeeDAO().SelectNoteBill(idTable);
+            MenuNote menu = new MenuNote(note, detailBills);
+            return (Object)menu;
         }
 
         [HttpGet, Route("getAllTable")]

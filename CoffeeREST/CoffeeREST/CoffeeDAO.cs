@@ -922,7 +922,7 @@ namespace CoffeeREST
         ///Add Bill (SelectIdBill() == -1)
         public bool AddBill(int idxTable, string idAccount)
         {
-            string strCmd = "INSERT INTO bill VALUES (null, @idAccount , @idxTable , now(), 0, 0, 0);";
+            string strCmd = "INSERT INTO bill VALUES (null, @idAccount , @idxTable , now(), 0, 0, 0, null);";
             return DataProvider.Instance.ExecuteNonQuery(strCmd, new object[] { idAccount, idxTable }) > 0;
         }
         //XoaBill
@@ -1079,6 +1079,19 @@ namespace CoffeeREST
                 tables.Add(table);
             }
             return tables;
+        }
+
+        public string SelectNoteBill(int id)
+        {
+            DataTable data = DataProvider.Instance.ExecuteQuery("SELECT * FROM Bill WHERE idxTable='" + id + "'AND statusBill=0");
+
+            if (data.Rows.Count > 0)
+            {
+                BillData bill = new BillData(data.Rows[0]);
+                return bill.Note;
+            }
+            else
+                return "Không có ghi chú";
         }
     }
 }

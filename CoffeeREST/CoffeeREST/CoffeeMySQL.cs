@@ -24,6 +24,18 @@ namespace CoffeeREST
         public List<ToppingDetail> Topping = new List<ToppingDetail>();
     }
 
+    public class MenuNote
+    {
+        public MenuNote(string note, List<Menu> menus)
+        {
+            Note = note;
+            Menus = menus;
+        }
+
+        public string Note { set; get; }
+        public List<Menu> Menus { set; get; }
+    }
+
     public class ToppingDetail
     {
         public int IdProduct { set; get; }
@@ -110,7 +122,7 @@ namespace CoffeeREST
     }
     public class AddProductToBill
     {
-
+        public string Note { set; get; }
         public int IdTable { set; get; }
         public string NameTable { set; get; }
         public string IdAccount { set; get; }
