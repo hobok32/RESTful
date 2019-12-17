@@ -920,10 +920,10 @@ namespace CoffeeREST
                 return -1;
         }
         ///Add Bill (SelectIdBill() == -1)
-        public bool AddBill(int idxTable, string idAccount)
+        public bool AddBill(int idxTable, string idAccount, string note)
         {
-            string strCmd = "INSERT INTO bill VALUES (null, @idAccount , @idxTable , now(), 0, 0, 0, null);";
-            return DataProvider.Instance.ExecuteNonQuery(strCmd, new object[] { idAccount, idxTable }) > 0;
+            string strCmd = "INSERT INTO bill VALUES (null, @idAccount , @idxTable , now(), 0, 0, 0, @note );";
+            return DataProvider.Instance.ExecuteNonQuery(strCmd, new object[] { idAccount, idxTable, note }) > 0;
         }
         //XoaBill
         public bool XoaBill(int idBill)

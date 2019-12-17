@@ -91,7 +91,7 @@ namespace CoffeeREST.Controllers
                 int idBill = new CoffeeDAO().SelectIdBill(addProductToBill.IdTable);
                 if (idBill == -1)
                 {
-                    bool result1 = new CoffeeDAO().AddBill(addProductToBill.IdTable, addProductToBill.IdAccount);
+                    bool result1 = new CoffeeDAO().AddBill(addProductToBill.IdTable, addProductToBill.IdAccount, addProductToBill.Note);
                     if (result1)
                     {
                         bool result2 = new CoffeeDAO().UpdateStatusTable(addProductToBill.IdTable, "Có người");
@@ -143,7 +143,7 @@ namespace CoffeeREST.Controllers
                     if (result11)
                     //Add lại
                     {
-                        bool result1 = new CoffeeDAO().AddBill(addProductToBill.IdTable, addProductToBill.IdAccount);
+                        bool result1 = new CoffeeDAO().AddBill(addProductToBill.IdTable, addProductToBill.IdAccount, addProductToBill.Note);
                         if (result1)
                         {
                             bool result2 = new CoffeeDAO().UpdateStatusTable(addProductToBill.IdTable, "Có người");
